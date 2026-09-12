@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apple Stock</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+    }
+    .logo {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .logo span {
+      background: #000;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #475569;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #f8fafc;
+    }
+    input:focus {
+      outline: none;
+      border-color: #000;
+      background: white;
+    }
+    .phone-row {
+      display: flex;
+      gap: 8px;
+    }
+    .phone-row select {
+      width: 110px;
+      padding: 12px 8px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      font-size: 14px;
+    }
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .error {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .success {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .toggle {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #64748b;
+    }
+    .toggle a {
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .hidden { display: none; }
+    .robot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo">
+      <span></span> Apple Stock
+    </div>
+
+    <h1 id="title">Welcome back</h1>
+    <p class="subtitle" id="subtitle">Sign in to your portfolio</p>
+
+    <div class="error" id="error"></div>
+    <div class="success" id="success"></div>
+
+    <!-- LOGIN -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="you@gmail.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn">Sign In</button>
+    </form>
+
+    <!-- SIGNUP -->
+    <form id="signupForm" class="hidden">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="John Doe" required>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="johndoe" required>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="you@gmail.com" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <div class="phone-row">
+          <select id="countryCode">
+            <option value="+1">+1 (US)</option>
+            <option value="+44">+44 (UK)</option>
+            <option value="+234">+234 (NG)</option>
+            <option value="+91">+91 (IN)</option>
+            <option value="+233">+233 (GH)</option>
+            <option value="+27">+27 (ZA)</option>
+            <option value="+971">+971 (AE)</option>
+            <option value="+61">+61 (AU)</option>
+            <option value="+49">+49 (DE)</option>
+            <option value="+33">+33 (FR)</option>
+          </select>
+          <input type="tel" id="phone" placeholder="8012345678" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <select id="country" required>
+          <option value="">Select Country</option>
+          <option value="United States">United States</option>
+          <option value="United Kingdom">United Kingdom</option>
+          <option value="Nigeria">Nigeria</option>
+          <option value="India">India</option>
+          <option value="Ghana">Ghana</option>
+          <option value="South Africa">South Africa</option>
+          <option value="United Arab Emirates">United Arab Emirates</option>
+          <option value="Canada">Canada</option>
+          <option value="Australia">Australia</option>
+          <option value="Germany">Germany</option>
+          <option value="France">France</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required minlength="6">
+      </div>
+
+      <label class="robot">
+        <input type="checkbox" id="notRobot" required>
+        I confirm I am not a robot
+      </label>
+
+      <button type="submit" class="btn">Create Account</button>
+    </form>
+
+    <div class="toggle">
+      <span id="toggleText">Don't have an account?</span>
+      <a id="toggleLink">Create one</a>
+    </div>
+  </div>
+
+  <script>
+    // ============ SUPABASE ============
+    const SUPABASE_URL = 'https://kbwhazbyqyvepyaelspo.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_od1eSv92ALG7u54kg6SR4g_87YdFT-n';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ============ TOGGLE ============
+    let isLogin = true;
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const title = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
+    const toggleText = document.getElementById('toggleText');
+    const toggleLink = document.getElementById('toggleLink');
+    const errorBox = document.getElementById('error');
+    const successBox = document.getElementById('success');
+
+    toggleLink.onclick = function() {
+      isLogin = !isLogin;
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
+
+      if (isLogin) {
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        title.textContent = 'Welcome back';
+        subtitle.textContent = 'Sign in to your portfolio';
+        toggleText.textContent = "Don't have an account?";
+        toggleLink.textContent = 'Create one';
+      } else {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        title.textContent = 'Create Account';
+        subtitle.textContent = 'Start building your portfolio';
+        toggleText.textContent = 'Already have an account?';
+        toggleLink.textContent = 'Sign in';
+      }
+    };
+
+    // ============ LOGIN ============
+    loginForm.onsubmit = async function(e) {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+      const btn = loginForm.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: document.getElementById('loginEmail').value.trim(),
+          password: document.getElementById('loginPassword').value
+        });
+        if (error) throw error;
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    };
+
+    // ============ SIGNUP ============
+    signupForm.onsubmit = async function(e) {
+      e.preventDefault();
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const username = document.getElementById('username').value.trim().toLowerCase();
+      const email = document.getElementById('signupEmail').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const country = document.getElementById('country').value;
+      const countryCode = document.getElementById('countryCode').value;
+      const password = document.getElementById('signupPassword').value;
+
+      if (!document.getElementById('notRobot').checked) {
+        errorBox.textContent = 'Please confirm you are not a robot';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      const btn = signupForm.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+
+      try {
+        // Create the account
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              full_name: fullName,
+              username: username
+            }
+          }
+        });
+
+        if (error) throw error;
+
+        // Save extra info to profiles table
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            email: email,
+            full_name: fullName,
+            username: username,
+            phone: countryCode + phone,
+            country: country,
+            country_code: countryCode
+          });
+        }
+
+        successBox.textContent = 'Account created! You can now Sign In.';
+        successBox.style.display = 'block';
+
+        // Switch to login form after 2 seconds
+        setTimeout(() => {
+          isLogin = true;
+          loginForm.classList.remove('hidden');
+          signupForm.classList.add('hidden');
+          title.textContent = 'Welcome back';
+          subtitle.textContent = 'Sign in to your portfolio';
+          toggleText.textContent = "Don't have an account?";
+          toggleLink.textContent = 'Create one';
+          document.getElementById('loginEmail').value = email;
+          successBox.style.display = 'none';
+        }, 2000);
+
+      } catch (err) {
+        errorBox.textContent = err.message || 'Failed to create account';
+        errorBox.style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    };
+  </script>
+</body>
+</html>
