@@ -136,19 +136,6 @@
       cursor: not-allowed;
     }
 
-    .btn-secondary {
-      width: 100%;
-      padding: 14px;
-      background: transparent;
-      color: #000000;
-      border: 1.5px solid #d1d1d6;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-
     .alert {
       padding: 13px 16px;
       border-radius: 12px;
@@ -173,23 +160,6 @@
       display: block;
     }
 
-    .otp-info {
-      text-align: center;
-      font-size: 15px;
-      color: #636366;
-      margin-bottom: 22px;
-      line-height: 1.5;
-    }
-
-    .otp-info strong {
-      color: #000000;
-      font-weight: 600;
-    }
-
-    #otp-form {
-      display: none;
-    }
-
     .footer-text {
       text-align: center;
       font-size: 12px;
@@ -203,7 +173,6 @@
 
   <div class="auth-card">
     <div class="brand-header">
-      <!-- Official Apple logo SVG -->
       <svg class="apple-logo" viewBox="0 0 24 24" fill="#000000">
         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
       </svg>
@@ -230,21 +199,6 @@
         <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
       </div>
       <button type="submit" class="btn-submit" id="login-btn">Log In</button>
-    </form>
-
-    <!-- OTP FORM -->
-    <form id="otp-form">
-      <div class="otp-info">
-        An 8-digit verification code has been sent to<br>
-        <strong id="otp-email-display">your email</strong>
-      </div>
-      <div class="form-group">
-        <label>Enter 8-digit Code</label>
-        <input type="text" id="otp-code" placeholder="00000000" maxlength="8" inputmode="numeric" required
-               style="text-align:center; font-size:22px; letter-spacing:8px; font-weight:600;">
-      </div>
-      <button type="submit" class="btn-submit" id="otp-btn">Verify & Continue</button>
-      <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
     </form>
 
     <!-- REGISTER FORM -->
@@ -277,15 +231,11 @@
     const SUPABASE_ANON_KEY = "sb_publishable_2dAuYIRPfwnjzgnZt5vOkw_MBi6AMZ1";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let pendingEmail = "";
-
     // Elements
     const loginTab = document.getElementById('login-tab');
     const registerTab = document.getElementById('register-tab');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
-    const otpForm = document.getElementById('otp-form');
-    const tabs = document.getElementById('tabs');
 
     function showAlert(msg, type = 'error') {
       const box = document.getElementById('alert-box');
@@ -300,8 +250,6 @@
 
     function switchTab(tab) {
       showAlert('');
-      otpForm.style.display = 'none';
-      tabs.style.display = 'flex';
 
       if (tab === 'login') {
         loginForm.style.display = 'block';
@@ -319,24 +267,19 @@
     loginTab.addEventListener('click', () => switchTab('login'));
     registerTab.addEventListener('click', () => switchTab('register'));
 
-    document.getElementById('back-to-login').addEventListener('click', () => {
-      switchTab('login');
-    });
-
-    // ===================== LOGIN (Password → OTP) =====================
+    // ===================== LOGIN =====================
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const loginBtn = document.getElementById('login-btn');
       loginBtn.disabled = true;
-      loginBtn.innerText = "Verifying...";
+      loginBtn.innerText = "Logging in...";
       showAlert('');
 
       const email = document.getElementById('login-email').value.trim().toLowerCase();
       const password = document.getElementById('login-password').value;
 
       try {
-        // 1. Check password is correct
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
@@ -344,26 +287,10 @@
 
         if (error) throw error;
 
-        // 2. Sign out immediately (we only wanted to validate password)
-        await supabase.auth.signOut();
-
-        // 3. Send OTP to the same email
-        const { error: otpError } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            shouldCreateUser: false
-          }
-        });
-
-        if (otpError) throw otpError;
-
-        // Show OTP screen
-        pendingEmail = email;
-        document.getElementById('otp-email-display').textContent = email;
-        loginForm.style.display = 'none';
-        tabs.style.display = 'none';
-        otpForm.style.display = 'block';
-        showAlert('An 8-digit code has been sent to your email.', 'success');
+        showAlert('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 800);
 
       } catch (err) {
         console.error(err);
@@ -371,40 +298,6 @@
       } finally {
         loginBtn.disabled = false;
         loginBtn.innerText = "Log In";
-      }
-    });
-
-    // ===================== OTP VERIFICATION =====================
-    otpForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const otpBtn = document.getElementById('otp-btn');
-      otpBtn.disabled = true;
-      otpBtn.innerText = "Verifying Code...";
-      showAlert('');
-
-      const code = document.getElementById('otp-code').value.trim();
-
-      try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          email: pendingEmail,
-          token: code,
-          type: 'email'
-        });
-
-        if (error) throw error;
-
-        showAlert('Login successful! Redirecting...', 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 900);
-
-      } catch (err) {
-        console.error(err);
-        showAlert(err.message || "Invalid or expired code. Please try again.", 'error');
-      } finally {
-        otpBtn.disabled = false;
-        otpBtn.innerText = "Verify & Continue";
       }
     });
 
@@ -422,7 +315,7 @@
       const password = document.getElementById('reg-password').value;
 
       try {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -432,14 +325,15 @@
           }
         });
 
-        if (authError) throw authError;
+        if (error) throw error;
 
-        // Profile is auto-created by the database trigger
-        // (the one we set up earlier with handle_new_user)
-
+        // Profile is auto-created by the trigger we set earlier
         showAlert('Account created successfully! Please log in.', 'success');
         registerForm.reset();
-        setTimeout(() => switchTab('login'), 1600);
+        
+        setTimeout(() => {
+          switchTab('login');
+        }, 1500);
 
       } catch (err) {
         console.error(err);
