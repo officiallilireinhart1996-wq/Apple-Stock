@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dashboard • Apple Invest</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f2f2f7;
+      color: #1c1c1e;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #fff;
+    }
+
+    /* Header */
+    .header {
+      background: #fff;
+      padding: 12px 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e5ea;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      background: #000;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-logo svg {
+      width: 22px;
+      height: 22px;
+      fill: white;
+    }
+
+    .header-title h1 {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .header-title p {
+      font-size: 12px;
+      color: #8e8e93;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f2f2f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .icon-btn .badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background: #ff3b30;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    /* Main Balance Card */
+    .balance-card {
+      margin: 16px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-label {
+      font-size: 14px;
+      color: #8e8e93;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .total-balance {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin: 6px 0 8px;
+    }
+
+    .profit-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .profit-positive {
+      color: #34c759;
+    }
+
+    .profit-negative {
+      color: #ff3b30;
+    }
+
+    .apple-watermark {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 70px;
+      height: 70px;
+      opacity: 0.08;
+    }
+
+    /* Chart + Price Info */
+    .price-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      gap: 12px;
+    }
+
+    .chart-placeholder {
+      flex: 1;
+      height: 80px;
+      background: linear-gradient(to top, rgba(52,199,89,0.15), transparent);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .price-info {
+      text-align: right;
+      min-width: 110px;
+    }
+
+    .current-price {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .price-change {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .high-low {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #8e8e93;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .action-btn {
+      flex: 1;
+      min-width: 70px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 8px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      cursor: pointer;
+      border: none;
+    }
+
+    .action-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      font-size: 16px;
+    }
+
+    .action-btn span {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+
+    /* Holdings Card */
+    .section {
+      margin: 20px 16px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .view-all {
+      font-size: 14px;
+      color: #007aff;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .holding-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    .holding-logo {
+      width: 44px;
+      height: 44px;
+      background: #000;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .holding-logo svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+
+    .holding-info {
+      flex: 1;
+    }
+
+    .holding-name {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .holding-symbol {
+      font-size: 13px;
+      color: #8e8e93;
+    }
+
+    .holding-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #8e8e93;
+    }
+
+    .holding-value {
+      text-align: right;
+    }
+
+    .holding-amount {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .holding-profit {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Hot Stocks */
+    .hot-banner {
+      background: linear-gradient(90deg, #fff5f5, #fff0f0);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .hot-banner i {
+      color: #ff3b30;
+      font-size: 18px;
+    }
+
+    .hot-text h3 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .hot-text p {
+      font-size: 12px;
+      color: #8e8e93;
+    }
+
+    /* Top Stocks Grid */
+    .stocks-grid {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .stock-card {
+      min-width: 140px;
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      cursor: pointer;
+    }
+
+    .stock-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+
+    .badge-top { background: #e8f5e9; color: #2e7d32; }
+    .badge-strong { background: #e3f2fd; color: #1565c0; }
+    .badge-hot { background: #ffebee; color: #c62828; }
+    .badge-trending { background: #fff3e0; color: #ef6c00; }
+    .badge-value { background: #f3e5f5; color: #7b1fa2; }
+
+    .stock-symbol {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .stock-price {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 4px 0;
+    }
+
+    .stock-change {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .mini-chart {
+      height: 30px;
+      margin-top: 10px;
+      background: linear-gradient(to top, rgba(52,199,89,0.2), transparent);
+      border-radius: 6px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid #e5e5ea;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0 24px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: #8e8e93;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-item.active {
+      color: #007aff;
+    }
+
+    .nav-item i {
+      font-size: 22px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #8e8e93;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div style="display:flex;gap:6px;align-items:center;font-size:14px;">
+      <span>●●●●</span>
+      <span>WiFi</span>
+      <span>100%</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      </div>
+      <div class="header-title">
+        <h1>Apple Invest</h1>
+        <p>Portfolio</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="icon-btn" onclick="location.href='notifications.html'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1c1c1e" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="badge" id="notifBadge" style="display:none;"></div>
+      </div>
+      <div class="icon-btn" onclick="location.href='profile.html'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1c1c1e" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Balance Card -->
+  <div class="balance-card">
+    <div class="balance-label">
+      Total Balance
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#8e8e93"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="total-balance" id="totalBalance">$0.00</div>
+    <div class="profit-row">
+      <span id="totalProfit" class="profit-positive">+$0.00 (0.00%)</span>
+      <span style="color:#8e8e93;font-weight:400;font-size:13px;">Total Profit</span>
+    </div>
+
+    <svg class="apple-watermark" viewBox="0 0 24 24" fill="#000"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+
+    <div class="price-section">
+      <div class="chart-placeholder">
+        <svg class="chart-line" viewBox="0 0 200 80" preserveAspectRatio="none">
+          <path d="M0,60 Q30,50 50,45 T100,30 T150,20 T200,10" fill="none" stroke="#34c759" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <div class="price-info">
+        <div style="font-size:12px;color:#8e8e93;">Cash Balance</div>
+        <div class="current-price" id="cashBalance">$0.00</div>
+        <div class="high-low">
+          <div>Invested<br><strong id="totalInvested">$0.00</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button class="action-btn" onclick="location.href='buy.html'">
+      <div class="action-icon" style="background:#e8f5e9;color:#34c759;">↑</div>
+      <span>Buy</span>
+    </button>
+    <button class="action-btn" onclick="location.href='sell.html'">
+      <div class="action-icon" style="background:#ffebee;color:#ff3b30;">↓</div>
+      <span>Sell</span>
+    </button>
+    <button class="action-btn" onclick="location.href='auto-invest.html'">
+      <div class="action-icon" style="background:#e3f2fd;color:#007aff;">⏱</div>
+      <span>Auto Invest</span>
+    </button>
+    <button class="action-btn" onclick="location.href='add-funds.html'">
+      <div class="action-icon" style="background:#f3e5f5;color:#9c27b0;">+</div>
+      <span>Add Funds</span>
+    </button>
+    <button class="action-btn" onclick="location.href='more.html'">
+      <div class="action-icon" style="background:#f2f2f7;color:#8e8e93;">•••</div>
+      <span>More</span>
+    </button>
+  </div>
+
+  <!-- Your Holdings -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Your Holdings</div>
+      <a href="portfolio.html" class="view-all">View All</a>
+    </div>
+    <div id="holdingsList">
+      <div class="loading">Loading holdings...</div>
+    </div>
+  </div>
+
+  <!-- Hot Stocks -->
+  <div class="section">
+    <div class="hot-banner">
+      <div style="font-size:22px;">🔥</div>
+      <div class="hot-text">
+        <h3>Hot Stocks</h3>
+        <p>Trending now. High potential.</p>
+      </div>
+      <a href="markets.html" class="view-all" style="margin-left:auto;">View All</a>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">Top Stocks To Invest</div>
+    </div>
+
+    <div class="stocks-grid" id="stocksGrid">
+      <div class="loading">Loading stocks...</div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="dashboard.html" class="nav-item active">
+      <div style="font-size:22px;">🏠</div>
+      <span>Home</span>
+    </a>
+    <a href="markets.html" class="nav-item">
+      <div style="font-size:22px;">📊</div>
+      <span>Markets</span>
+    </a>
+    <a href="portfolio.html" class="nav-item">
+      <div style="font-size:22px;">💼</div>
+      <span>Portfolio</span>
+    </a>
+    <a href="discover.html" class="nav-item">
+      <div style="font-size:22px;">🔍</div>
+      <span>Discover</span>
+    </a>
+    <a href="more.html" class="nav-item">
+      <div style="font-size:22px;">☰</div>
+      <span>More</span>
+    </a>
+  </div>
+
+  <script>
+    // ====================== SUPABASE ======================
+    const SUPABASE_URL = "https://ueejdaybdlgvpunbydjw.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_2dAuYIRPfwnjzgnZt5vOkw_MBi6AMZ1";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let profile = null;
+    let holdings = [];
+    let stocks = {};
+
+    // ====================== AUTH CHECK ======================
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return null;
+      }
+      currentUser = session.user;
+      return session.user;
+    }
+
+    // ====================== LOAD DATA ======================
+    async function loadProfile() {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (error) {
+        console.error('Profile error:', error);
+        return;
+      }
+      profile = data;
+      updateBalanceUI();
+    }
+
+    async function loadHoldings() {
+      const { data, error } = await supabase
+        .from('holdings')
+        .select('*, stocks(*)')
+        .eq('user_id', currentUser.id);
+
+      if (error) {
+        console.error('Holdings error:', error);
+        return;
+      }
+      holdings = data || [];
+      renderHoldings();
+      updateBalanceUI();
+    }
+
+    async function loadStocks() {
+      const { data, error } = await supabase
+        .from('stocks')
+        .select('*')
+        .order('symbol');
+
+      if (error) {
+        console.error('Stocks error:', error);
+        return;
+      }
+
+      stocks = {};
+      (data || []).forEach(s => stocks[s.symbol] = s);
+      renderStocks();
+      updateBalanceUI();
+    }
+
+    // ====================== UI UPDATES ======================
+    function formatMoney(num) {
+      return '$' + Number(num || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function updateBalanceUI() {
+      if (!profile) return;
+
+      // Calculate total market value of holdings
+      let holdingsValue = 0;
+      holdings.forEach(h => {
+        const price = stocks[h.symbol]?.current_price || h.avg_cost;
+        holdingsValue += (h.shares * price);
+      });
+
+      const cash = Number(profile.balance || 0);
+      const totalBalance = cash + holdingsValue;
+      const totalProfit = Number(profile.total_profit || 0);
+      const totalInvested = Number(profile.total_invested || 0);
+
+      // Profit percent
+      let profitPercent = 0;
+      if (totalInvested > 0) {
+        profitPercent = (totalProfit / totalInvested) * 100;
+      }
+
+      document.getElementById('totalBalance').textContent = formatMoney(totalBalance);
+      document.getElementById('cashBalance').textContent = formatMoney(cash);
+      document.getElementById('totalInvested').textContent = formatMoney(totalInvested);
+
+      const profitEl = document.getElementById('totalProfit');
+      const sign = totalProfit >= 0 ? '+' : '';
+      profitEl.textContent = `${sign}${formatMoney(totalProfit)} (${profitPercent.toFixed(2)}%)`;
+      profitEl.className = totalProfit >= 0 ? 'profit-positive' : 'profit-negative';
+    }
+
+    function renderHoldings() {
+      const container = document.getElementById('holdingsList');
+
+      if (!holdings.length) {
+        container.innerHTML = `
+          <div style="background:#fff;border-radius:18px;padding:30px;text-align:center;color:#8e8e93;">
+            No holdings yet.<br>
+            <button onclick="location.href='buy.html'" style="margin-top:12px;background:#000;color:#fff;border:none;padding:10px 20px;border-radius:12px;font-weight:600;cursor:pointer;">
+              Buy your first stock
+            </button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = holdings.map(h => {
+        const stock = stocks[h.symbol] || {};
+        const currentPrice = stock.current_price || h.avg_cost;
+        const marketValue = h.shares * currentPrice;
+        const costBasis = h.shares * h.avg_cost;
+        const profit = marketValue - costBasis;
+        const profitPct = costBasis > 0 ? (profit / costBasis) * 100 : 0;
+        const isPositive = profit >= 0;
+
+        return `
+          <div class="holding-card" onclick="location.href='${h.symbol.toLowerCase()}.html'">
+            <div class="holding-logo">
+              <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            </div>
+            <div class="holding-info">
+              <div class="holding-name">${stock.name || h.symbol}</div>
+              <div class="holding-symbol">${h.symbol}</div>
+              <div class="holding-stats">
+                <span>${Number(h.shares).toFixed(3)} shares</span>
+                <span>Avg $${Number(h.avg_cost).toFixed(2)}</span>
+              </div>
+            </div>
+            <div class="holding-value">
+              <div class="holding-amount">${formatMoney(marketValue)}</div>
+              <div class="holding-profit ${isPositive ? 'profit-positive' : 'profit-negative'}">
+                ${isPositive ? '+' : ''}${formatMoney(profit)} (${profitPct.toFixed(2)}%)
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderStocks() {
+      const container = document.getElementById('stocksGrid');
+      const list = Object.values(stocks);
+
+      if (!list.length) {
+        container.innerHTML = `<div class="loading">No stocks found</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(s => {
+        let badge = '';
+        if (s.is_top_pick) badge = `<span class="stock-badge badge-top">Top Pick</span>`;
+        else if (s.is_strong_buy) badge = `<span class="stock-badge badge-strong">Strong Buy</span>`;
+        else if (s.is_hot) badge = `<span class="stock-badge badge-hot">Hot</span>`;
+        else if (s.is_trending) badge = `<span class="stock-badge badge-trending">Trending</span>`;
+        else if (s.is_great_value) badge = `<span class="stock-badge badge-value">Great Value</span>`;
+
+        const isPositive = (s.change_percent || 0) >= 0;
+
+        return `
+          <div class="stock-card" onclick="location.href='${s.symbol.toLowerCase()}.html'">
+            ${badge}
+            <div class="stock-symbol">${s.symbol}</div>
+            <div class="stock-price">${formatMoney(s.current_price)}</div>
+            <div class="stock-change ${isPositive ? 'profit-positive' : 'profit-negative'}">
+              ${isPositive ? '▲' : '▼'} ${Math.abs(s.change_percent || 0).toFixed(2)}%
+            </div>
+            <div class="mini-chart"></div>
+          </div>`;
+      }).join('');
+    }
+
+    // ====================== REALTIME ======================
+    function setupRealtime() {
+      // Profile changes (balance, profit)
+      supabase
+        .channel('profile-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${currentUser.id}`
+        }, (payload) => {
+          profile = payload.new;
+          updateBalanceUI();
+        })
+        .subscribe();
+
+      // Holdings changes
+      supabase
+        .channel('holdings-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'holdings',
+          filter: `user_id=eq.${currentUser.id}`
+        }, () => {
+          loadHoldings();
+        })
+        .subscribe();
+
+      // Stocks price changes (admin updates)
+      supabase
+        .channel('stocks-changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'stocks'
+        }, () => {
+          loadStocks();
+        })
+        .subscribe();
+    }
+
+    // ====================== INIT ======================
+    (async () => {
+      const user = await checkAuth();
+      if (!user) return;
+
+      await Promise.all([
+        loadProfile(),
+        loadHoldings(),
+        loadStocks()
+      ]);
+
+      setupRealtime();
+    })();
+  </script>
+</body>
+</html>
