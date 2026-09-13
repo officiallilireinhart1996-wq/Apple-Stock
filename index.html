@@ -1,105 +1,390 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apple Investor Hub - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sign Up • Stock App</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      background-color: #0d0d0d;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #f8f9fc 0%, #eef1f8 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #1c1c1e;
+      overflow-x: hidden;
+    }
+
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+
+    .container {
+      flex: 1;
+      padding: 20px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      max-width: 420px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .logo-area {
+      text-align: center;
+      margin: 30px 0 40px;
+    }
+
+    .logo-circle {
+      width: 72px;
+      height: 72px;
+      background: #000;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    .logo-circle svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #8e8e93;
+      font-weight: 400;
+    }
+
+    .form-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .input-group {
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #636366;
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 52px;
+      border: 1.5px solid #e5e5ea;
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 16px;
+      background: #f9f9fb;
+      transition: all 0.2s ease;
+      outline: none;
+      color: #1c1c1e;
+    }
+
+    .input-group input:focus {
+      border-color: #007aff;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(0,122,255,0.12);
+    }
+
+    .btn-primary {
+      width: 100%;
+      height: 54px;
+      background: #000;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 28px 0;
+      color: #8e8e93;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e5e5ea;
+    }
+
+    .divider span {
+      padding: 0 14px;
+    }
+
+    .login-link {
+      text-align: center;
+      font-size: 15px;
+      color: #8e8e93;
+    }
+
+    .login-link a {
+      color: #007aff;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .error-box {
+      background: #fff2f2;
+      border: 1px solid #ffcdd2;
+      color: #d32f2f;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .success-box {
+      background: #e8f5e9;
+      border: 1px solid #c8e6c9;
+      color: #2e7d32;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: #aeaeb2;
+      margin-top: auto;
+      padding-top: 30px;
+      line-height: 1.5;
     }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen px-4">
-
-  <div class="w-full max-w-md bg-[#141414] border border-[#222] rounded-2xl p-8 shadow-2xl">
-    
-    <!-- Logo + Title -->
-    <div class="flex flex-col items-center mb-8">
-      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-        <span class="text-black text-2xl font-bold"></span>
-      </div>
-      <h1 class="text-white text-2xl font-semibold mt-4 tracking-tight">Apple Investor Hub</h1>
-      <p class="text-[#888] text-sm mt-1">Institutional Growth & Asset Management</p>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M1 4.5h2.5v3H1zM5 3h2.5v6H5zM9 1.5h2.5v9H9zM13 0h2.5v12H13z"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.5c1.8 0 3.4.7 4.6 1.9l1.4-1.4C12.4.5 10.3 0 8 0S3.6.5 1.9 3l1.4 1.4C4.6 3.2 6.2 2.5 8 2.5zM8 6c.9 0 1.7.3 2.3.9l1.4-1.4C10.7 4.5 9.4 4 8 4s-2.7.5-3.7 1.5l1.4 1.4C6.3 6.3 7.1 6 8 6zM8 9.5c.5 0 .9.2 1.2.5L8 11.2l-1.2-1.2c.3-.3.7-.5 1.2-.5z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="3.5" width="2" height="5" rx="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1"/></svg>
     </div>
-
-    <!-- Alert Box -->
-    <div id="alertBox" class="hidden mb-4 p-4 text-sm rounded-xl border bg-red-950/30 border-red-900 text-red-400"></div>
-
-    <!-- Login Form -->
-    <form id="loginForm" class="space-y-5">
-      <div>
-        <label class="block text-xs font-medium uppercase tracking-wider text-[#aaa] mb-2">Secure Email Address</label>
-        <input type="email" id="email" required placeholder="name@example.com"
-          class="w-full bg-[#1c1c1c] border border-[#333] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white transition-all text-sm">
-      </div>
-
-      <div>
-        <label class="block text-xs font-medium uppercase tracking-wider text-[#aaa] mb-2">Access PIN / Password</label>
-        <input type="password" id="password" required placeholder="••••••••"
-          class="w-full bg-[#1c1c1c] border border-[#333] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white transition-all text-sm">
-      </div>
-
-      <button type="submit" id="submitBtn"
-        class="w-full bg-white hover:bg-gray-200 active:scale-[0.99] text-black font-medium py-3.5 rounded-xl transition-all text-sm mt-2">
-        Verify Credentials
-      </button>
-    </form>
   </div>
 
-  <div class="text-center mt-6">
-    <p class="text-xs text-neutral-500">
-      First-time deployment? 
-      <a href="signup.html" class="text-white hover:underline font-medium">Create portal account</a>
+  <div class="container">
+    <div class="logo-area">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      </div>
+      <h1>Create Account</h1>
+      <p class="subtitle">Start investing with real-time markets</p>
+    </div>
+
+    <div class="form-card">
+      <div id="errorBox" class="error-box"></div>
+      <div id="successBox" class="success-box"></div>
+
+      <form id="signupForm">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="fullName" placeholder="John Doe" required autocomplete="name" />
+        </div>
+
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="you@gmail.com" required autocomplete="email" />
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password" />
+        </div>
+
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat password" required minlength="6" autocomplete="new-password" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <span id="btnText">Create Account</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+      </form>
+    </div>
+
+    <div class="divider"><span>or</span></div>
+
+    <p class="login-link">
+      Already have an account? <a href="login.html">Log In</a>
+    </p>
+
+    <p class="footer-note">
+      By signing up you agree to our Terms of Service<br>and Privacy Policy
     </p>
   </div>
 
   <script>
-    // ============ YOUR SUPABASE ============
-    const SUPABASE_URL = 'https://kbwhazbyqyvepyaelspo.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_od1eSv92ALG7u54kg6SR4g_87YdFT-n';
+    // ====================== SUPABASE CONFIG ======================
+    const SUPABASE_URL = "https://ueejdaybdlgvpunbydjw.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_2dAuYIRPfwnjzgnZt5vOkw_MBi6AMZ1";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ============ LOGIN ============
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    // ====================== FORM HANDLING ======================
+    const form = document.getElementById("signupForm");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const spinner = document.getElementById("spinner");
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+      successBox.style.display = "none";
+    }
+
+    function showSuccess(msg) {
+      successBox.textContent = msg;
+      successBox.style.display = "block";
+      errorBox.style.display = "none";
+    }
+
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      btnText.style.display = loading ? "none" : "inline";
+      spinner.style.display = loading ? "block" : "none";
+    }
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const alertBox = document.getElementById('alertBox');
-      const submitBtn = document.getElementById('submitBtn');
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
 
-      alertBox.classList.add('hidden');
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Authenticating secure terminal...";
+      // Validation
+      if (!fullName) {
+        showError("Please enter your full name");
+        return;
+      }
+      if (password.length < 6) {
+        showError("Password must be at least 6 characters");
+        return;
+      }
+      if (password !== confirmPassword) {
+        showError("Passwords do not match");
+        return;
+      }
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      setLoading(true);
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
+        // 1. Create user in Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName
+            }
+          }
         });
 
         if (error) throw error;
 
-        // Save basic session info
-        localStorage.setItem("userId", data.user.id);
-        localStorage.setItem("userEmail", data.user.email);
+        // Profile is auto-created by the trigger we set earlier
+        showSuccess("Account created successfully! Redirecting to login...");
 
-        // Go to dashboard
-        window.location.href = "dashboard.html";
+        // Clear form
+        form.reset();
+
+        // Redirect to login after short delay
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 1800);
 
       } catch (err) {
-        alertBox.innerText = err.message || "Invalid credentials or network error.";
-        alertBox.classList.remove('hidden');
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Verify Credentials";
+        console.error(err);
+        showError(err.message || "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
       }
     });
+
+    // Optional: Auto-redirect if already logged in
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = "dashboard.html";
+      }
+    })();
   </script>
 </body>
 </html>
