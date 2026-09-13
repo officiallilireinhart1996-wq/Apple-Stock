@@ -1,388 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sign Up • Stock App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Apple Invest • Sign In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(180deg, #f8f9fc 0%, #eef1f8 100%);
-      min-height: 100vh;
+      background: #000000;
+      color: #ffffff;
       display: flex;
-      flex-direction: column;
-      color: #1c1c1e;
-      overflow-x: hidden;
-    }
-
-    .status-bar {
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #1c1c1e;
-    }
-
-    .container {
-      flex: 1;
-      padding: 20px 24px 40px;
-      display: flex;
-      flex-direction: column;
-      max-width: 420px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .logo-area {
-      text-align: center;
-      margin: 30px 0 40px;
-    }
-
-    .logo-circle {
-      width: 72px;
-      height: 72px;
-      background: #000;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
     }
 
-    .logo-circle svg {
-      width: 40px;
-      height: 40px;
-      fill: white;
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 15px;
-      color: #8e8e93;
-      font-weight: 400;
-    }
-
-    .form-card {
-      background: white;
+    .auth-card {
+      background: #ffffff;
+      color: #1c1c1e;
+      width: 100%;
+      max-width: 400px;
       border-radius: 24px;
-      padding: 28px 24px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      padding: 36px 28px 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .apple-logo {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      display: block;
+    }
+
+    .brand-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #000000;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-header p {
+      font-size: 14px;
+      color: #8e8e93;
+      margin-top: 4px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1.5px solid #e5e5ea;
       margin-bottom: 24px;
     }
 
-    .input-group {
+    .tab-btn {
+      flex: 1;
+      padding: 14px 0;
+      background: none;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      color: #8e8e93;
+      cursor: pointer;
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .tab-btn.active {
+      color: #000000;
+      border-bottom: 3px solid #000000;
+    }
+
+    .form-group {
       margin-bottom: 18px;
     }
 
-    .input-group label {
+    .form-group label {
       display: block;
       font-size: 13px;
       font-weight: 600;
       color: #636366;
-      margin-bottom: 8px;
-      letter-spacing: 0.2px;
+      margin-bottom: 7px;
     }
 
-    .input-group input {
+    .form-group input {
       width: 100%;
-      height: 52px;
-      border: 1.5px solid #e5e5ea;
+      padding: 14px 16px;
+      border: 1.5px solid #d1d1d6;
       border-radius: 14px;
-      padding: 0 16px;
       font-size: 16px;
-      background: #f9f9fb;
-      transition: all 0.2s ease;
       outline: none;
       color: #1c1c1e;
+      background: #f9f9fb;
+      transition: all 0.2s;
     }
 
-    .input-group input:focus {
-      border-color: #007aff;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(0,122,255,0.12);
+    .form-group input:focus {
+      border-color: #000000;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
     }
 
-    .btn-primary {
+    .btn-submit {
       width: 100%;
-      height: 54px;
-      background: #000;
-      color: white;
+      padding: 16px;
+      background: #000000;
+      color: #ffffff;
       border: none;
-      border-radius: 16px;
+      border-radius: 14px;
       font-size: 17px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
       margin-top: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      transition: opacity 0.2s, transform 0.15s;
     }
 
-    .btn-primary:active {
+    .btn-submit:active {
       transform: scale(0.98);
-      opacity: 0.9;
     }
 
-    .btn-primary:disabled {
-      opacity: 0.6;
+    .btn-submit:disabled {
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 28px 0;
-      color: #8e8e93;
-      font-size: 13px;
+    .btn-secondary {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: #000000;
+      border: 1.5px solid #d1d1d6;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
     }
 
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #e5e5ea;
+    .alert {
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 18px;
+      display: none;
+      word-break: break-word;
+      line-height: 1.4;
     }
 
-    .divider span {
-      padding: 0 14px;
+    .alert.error {
+      background: #fff2f2;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+      display: block;
     }
 
-    .login-link {
+    .alert.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+      display: block;
+    }
+
+    .otp-info {
       text-align: center;
       font-size: 15px;
-      color: #8e8e93;
+      color: #636366;
+      margin-bottom: 22px;
+      line-height: 1.5;
     }
 
-    .login-link a {
-      color: #007aff;
+    .otp-info strong {
+      color: #000000;
       font-weight: 600;
-      text-decoration: none;
     }
 
-    .error-box {
-      background: #fff2f2;
-      border: 1px solid #ffcdd2;
-      color: #d32f2f;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 18px;
+    #otp-form {
       display: none;
     }
 
-    .success-box {
-      background: #e8f5e9;
-      border: 1px solid #c8e6c9;
-      color: #2e7d32;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 18px;
-      display: none;
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .footer-note {
+    .footer-text {
       text-align: center;
       font-size: 12px;
       color: #aeaeb2;
-      margin-top: auto;
-      padding-top: 30px;
+      margin-top: 28px;
       line-height: 1.5;
     }
   </style>
 </head>
 <body>
-  <div class="status-bar">
-    <span>9:41</span>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M1 4.5h2.5v3H1zM5 3h2.5v6H5zM9 1.5h2.5v9H9zM13 0h2.5v12H13z"/></svg>
-      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.5c1.8 0 3.4.7 4.6 1.9l1.4-1.4C12.4.5 10.3 0 8 0S3.6.5 1.9 3l1.4 1.4C4.6 3.2 6.2 2.5 8 2.5zM8 6c.9 0 1.7.3 2.3.9l1.4-1.4C10.7 4.5 9.4 4 8 4s-2.7.5-3.7 1.5l1.4 1.4C6.3 6.3 7.1 6 8 6zM8 9.5c.5 0 .9.2 1.2.5L8 11.2l-1.2-1.2c.3-.3.7-.5 1.2-.5z"/></svg>
-      <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="21" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="22" y="3.5" width="2" height="5" rx="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1"/></svg>
-    </div>
-  </div>
 
-  <div class="container">
-    <div class="logo-area">
-      <div class="logo-circle">
-        <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+  <div class="auth-card">
+    <div class="brand-header">
+      <!-- Official Apple logo SVG -->
+      <svg class="apple-logo" viewBox="0 0 24 24" fill="#000000">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+      </svg>
+      <h1>Apple Invest</h1>
+      <p>Secure access to your portfolio</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+      <button id="login-tab" class="tab-btn active">Log In</button>
+      <button id="register-tab" class="tab-btn">Register</button>
+    </div>
+
+    <div id="alert-box" class="alert"></div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="name@example.com" required autocomplete="email">
       </div>
-      <h1>Create Account</h1>
-      <p class="subtitle">Start investing with real-time markets</p>
-    </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-submit" id="login-btn">Log In</button>
+    </form>
 
-    <div class="form-card">
-      <div id="errorBox" class="error-box"></div>
-      <div id="successBox" class="success-box"></div>
+    <!-- OTP FORM -->
+    <form id="otp-form">
+      <div class="otp-info">
+        An 8-digit verification code has been sent to<br>
+        <strong id="otp-email-display">your email</strong>
+      </div>
+      <div class="form-group">
+        <label>Enter 8-digit Code</label>
+        <input type="text" id="otp-code" placeholder="00000000" maxlength="8" inputmode="numeric" required
+               style="text-align:center; font-size:22px; letter-spacing:8px; font-weight:600;">
+      </div>
+      <button type="submit" class="btn-submit" id="otp-btn">Verify & Continue</button>
+      <button type="button" class="btn-secondary" id="back-to-login">← Back to Login</button>
+    </form>
 
-      <form id="signupForm">
-        <div class="input-group">
-          <label>Full Name</label>
-          <input type="text" id="fullName" placeholder="John Doe" required autocomplete="name" />
-        </div>
+    <!-- REGISTER FORM -->
+    <form id="register-form" style="display: none;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="John Doe" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="reg-email" placeholder="name@example.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn-submit" id="reg-btn">Create Account</button>
+    </form>
 
-        <div class="input-group">
-          <label>Email</label>
-          <input type="email" id="email" placeholder="you@gmail.com" required autocomplete="email" />
-        </div>
-
-        <div class="input-group">
-          <label>Password</label>
-          <input type="password" id="password" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password" />
-        </div>
-
-        <div class="input-group">
-          <label>Confirm Password</label>
-          <input type="password" id="confirmPassword" placeholder="Repeat password" required minlength="6" autocomplete="new-password" />
-        </div>
-
-        <button type="submit" class="btn-primary" id="submitBtn">
-          <span id="btnText">Create Account</span>
-          <div class="spinner" id="spinner"></div>
-        </button>
-      </form>
-    </div>
-
-    <div class="divider"><span>or</span></div>
-
-    <p class="login-link">
-      Already have an account? <a href="login.html">Log In</a>
-    </p>
-
-    <p class="footer-note">
-      By signing up you agree to our Terms of Service<br>and Privacy Policy
+    <p class="footer-text">
+      By continuing you agree to our Terms of Service<br>and Privacy Policy
     </p>
   </div>
 
-  <script>
-    // ====================== SUPABASE CONFIG ======================
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    // ========== YOUR SUPABASE PROJECT ==========
     const SUPABASE_URL = "https://ueejdaybdlgvpunbydjw.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_2dAuYIRPfwnjzgnZt5vOkw_MBi6AMZ1";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let pendingEmail = "";
 
-    // ====================== FORM HANDLING ======================
-    const form = document.getElementById("signupForm");
-    const errorBox = document.getElementById("errorBox");
-    const successBox = document.getElementById("successBox");
-    const submitBtn = document.getElementById("submitBtn");
-    const btnText = document.getElementById("btnText");
-    const spinner = document.getElementById("spinner");
+    // Elements
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const otpForm = document.getElementById('otp-form');
+    const tabs = document.getElementById('tabs');
 
-    function showError(msg) {
-      errorBox.textContent = msg;
-      errorBox.style.display = "block";
-      successBox.style.display = "none";
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alert-box');
+      if (!msg) {
+        box.style.display = 'none';
+        return;
+      }
+      box.className = `alert ${type}`;
+      box.innerText = msg;
+      box.style.display = 'block';
     }
 
-    function showSuccess(msg) {
-      successBox.textContent = msg;
-      successBox.style.display = "block";
-      errorBox.style.display = "none";
+    function switchTab(tab) {
+      showAlert('');
+      otpForm.style.display = 'none';
+      tabs.style.display = 'flex';
+
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+      } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+      }
     }
 
-    function setLoading(loading) {
-      submitBtn.disabled = loading;
-      btnText.style.display = loading ? "none" : "inline";
-      spinner.style.display = loading ? "block" : "none";
-    }
+    loginTab.addEventListener('click', () => switchTab('login'));
+    registerTab.addEventListener('click', () => switchTab('register'));
 
-    form.addEventListener("submit", async (e) => {
+    document.getElementById('back-to-login').addEventListener('click', () => {
+      switchTab('login');
+    });
+
+    // ===================== LOGIN (Password → OTP) =====================
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const fullName = document.getElementById("fullName").value.trim();
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
+      const loginBtn = document.getElementById('login-btn');
+      loginBtn.disabled = true;
+      loginBtn.innerText = "Verifying...";
+      showAlert('');
 
-      // Validation
-      if (!fullName) {
-        showError("Please enter your full name");
-        return;
-      }
-      if (password.length < 6) {
-        showError("Password must be at least 6 characters");
-        return;
-      }
-      if (password !== confirmPassword) {
-        showError("Passwords do not match");
-        return;
-      }
-
-      setLoading(true);
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
 
       try {
-        // 1. Create user in Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
+        // 1. Check password is correct
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
-          password,
-          options: {
-            data: {
-              full_name: fullName
-            }
-          }
+          password
         });
 
         if (error) throw error;
 
-        // Profile is auto-created by the trigger we set earlier
-        showSuccess("Account created successfully! Redirecting to login...");
+        // 2. Sign out immediately (we only wanted to validate password)
+        await supabase.auth.signOut();
 
-        // Clear form
-        form.reset();
+        // 3. Send OTP to the same email
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: false
+          }
+        });
 
-        // Redirect to login after short delay
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1800);
+        if (otpError) throw otpError;
+
+        // Show OTP screen
+        pendingEmail = email;
+        document.getElementById('otp-email-display').textContent = email;
+        loginForm.style.display = 'none';
+        tabs.style.display = 'none';
+        otpForm.style.display = 'block';
+        showAlert('An 8-digit code has been sent to your email.', 'success');
 
       } catch (err) {
         console.error(err);
-        showError(err.message || "Something went wrong. Please try again.");
+        showAlert(err.message || "Invalid email or password.", 'error');
       } finally {
-        setLoading(false);
+        loginBtn.disabled = false;
+        loginBtn.innerText = "Log In";
       }
     });
 
-    // Optional: Auto-redirect if already logged in
+    // ===================== OTP VERIFICATION =====================
+    otpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const otpBtn = document.getElementById('otp-btn');
+      otpBtn.disabled = true;
+      otpBtn.innerText = "Verifying Code...";
+      showAlert('');
+
+      const code = document.getElementById('otp-code').value.trim();
+
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: pendingEmail,
+          token: code,
+          type: 'email'
+        });
+
+        if (error) throw error;
+
+        showAlert('Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 900);
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Invalid or expired code. Please try again.", 'error');
+      } finally {
+        otpBtn.disabled = false;
+        otpBtn.innerText = "Verify & Continue";
+      }
+    });
+
+    // ===================== REGISTRATION =====================
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const regBtn = document.getElementById('reg-btn');
+      regBtn.disabled = true;
+      regBtn.innerText = "Creating Account...";
+      showAlert('');
+
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name
+            }
+          }
+        });
+
+        if (authError) throw authError;
+
+        // Profile is auto-created by the database trigger
+        // (the one we set up earlier with handle_new_user)
+
+        showAlert('Account created successfully! Please log in.', 'success');
+        registerForm.reset();
+        setTimeout(() => switchTab('login'), 1600);
+
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message || "Could not create account.", 'error');
+      } finally {
+        regBtn.disabled = false;
+        regBtn.innerText = "Create Account";
+      }
+    });
+
+    // Auto-redirect if already logged in
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        window.location.href = "dashboard.html";
+        window.location.href = 'dashboard.html';
       }
     })();
   </script>
